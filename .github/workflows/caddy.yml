@@ -10,8 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Main Repository
         uses: actions/checkout@v2
+
+      - name: Checkout Caddy Repository
+        uses: actions/checkout@v2
+        with:
+          repository: caddyserver/caddy
+          path: caddy
 
       - name: Set up Git
         env:
@@ -25,24 +31,13 @@ jobs:
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
 
-      - name: Clean up existing directory
-        run: |
-          rm -rf proxy-auto-deploy
-
-      - name: Copy Repository
-        run: |
-          # 创建目标目录
-          mkdir -p proxy-auto-deploy
-          # 复制内容到目标目录
-          cp -r * proxy-auto-deploy/
-
       - name: Build Docker image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           IMAGE_NAME: caddy-proxy
         run: |
-          cd proxy-auto-deploy
-          docker build -t $DOCKER_USERNAME/$IMAGE_NAME:latest .
+          cp caddy-deploy/Caddyfile caddy/Caddyfile  # 复制Caddyfile到caddy目录
+          docker build -t $DOCKER_USERNAME/$IMAGE_NAME:latest caddy
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
