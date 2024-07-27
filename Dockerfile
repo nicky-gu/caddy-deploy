@@ -12,7 +12,7 @@ FROM caddy:latest
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
 # 设置Caddy二进制文件的可执行权限
-RUN chmod +x /usr/bin/caddy
+RUN chmod 755 /usr/bin/caddy
 
 # 复制Caddyfile到Caddy的配置目录
 COPY Caddyfile /etc/caddy/Caddyfile
