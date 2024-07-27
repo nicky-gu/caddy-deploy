@@ -31,12 +31,23 @@ jobs:
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
 
+      - name: Create Caddyfile Directory
+        run: |
+          mkdir -p caddy/config
+
+      - name: Download Caddyfile
+        run: |
+          curl -o caddy/config/Caddyfile https://raw.githubusercontent.com/nicky-gu/caddy-deploy/main/Caddyfile
+
+      - name: Download Dockerfile
+        run: |
+          curl -o caddy/Dockerfile https://raw.githubusercontent.com/nicky-gu/caddy-deploy/main/Dockerfile
+
       - name: Build Docker image
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           IMAGE_NAME: caddy-proxy
         run: |
-          cp caddy-deploy/Caddyfile caddy/Caddyfile  # 复制Caddyfile到caddy目录
           docker build -t $DOCKER_USERNAME/$IMAGE_NAME:latest caddy
 
       - name: Log in to Docker Hub
