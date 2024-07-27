@@ -16,3 +16,6 @@ RUN chmod +x /usr/bin/caddy
 
 # 复制Caddyfile到Caddy的配置目录
 COPY Caddyfile /etc/caddy/Caddyfile
+
+# 运行 Caddy
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
