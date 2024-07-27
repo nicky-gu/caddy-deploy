@@ -1,0 +1,23 @@
+{
+    # 全局配置，启用自动HTTPS
+    auto_https on
+}
+
+# 监听443端口，并启用forwardproxy
+:443 {
+    # 使用自动HTTPS
+    tls your-email@example.com
+
+    # 配置 forwardproxy 插件
+    forward_proxy {
+        basic_auth user password  # 添加匿名认证
+        hide_ip
+        hide_via
+        probe_resistance secret.localhost
+    }
+
+    # 将所有流量代理到本地
+    reverse_proxy * {
+        to localhost:8080
+    }
+}
