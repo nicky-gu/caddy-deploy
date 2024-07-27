@@ -37,7 +37,7 @@ jobs:
 
       - name: Download Caddyfile
         run: |
-          curl -o caddy/config/Caddyfile https://raw.githubusercontent.com/nicky-gu/caddy-deploy/main/Caddyfile
+          curl -o caddy/Caddyfile https://raw.githubusercontent.com/nicky-gu/caddy-deploy/main/Caddyfile
 
       - name: Download Dockerfile
         run: |
