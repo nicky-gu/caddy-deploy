@@ -1,0 +1,67 @@
+name: Build and Push Caddy Proxy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          repository: caddyserver/caddy
+          path: caddy
+
+      - name: Set up Git
+        env:
+          GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
+          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        run: |
+          git config --global user.email "$GIT_EMAIL"
+          git config --global user.name "$GIT_USERNAME"
+
+      - name: Set Timezone to Asia/Shanghai
+        run: |
+          sudo timedatectl set-timezone Asia/Shanghai
+
+      - name: Clean up existing directory
+        run: |
+          rm -rf proxy-auto-deploy
+
+      - name: Copy Caddy Repository
+        run: |
+          # 创建目标目录
+          mkdir -p proxy-auto-deploy/caddy
+          # 复制内容到目标目录
+          cp -r caddy/* proxy-auto-deploy/caddy/
+
+      - name: Add Custom Caddy Configuration
+        run: |
+          # 这里假设你已经有一个自定义的Caddy配置文件
+          cp path/to/your/Caddyfile proxy-auto-deploy/caddy/
+
+      - name: Build Docker image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          IMAGE_NAME: caddy-proxy
+        run: |
+          cd proxy-auto-deploy/caddy
+          docker build -t $DOCKER_USERNAME/$IMAGE_NAME:latest .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          IMAGE_NAME: caddy-proxy
+        run: |
+          docker tag $DOCKER_USERNAME/$IMAGE_NAME:latest $DOCKER_USERNAME/$IMAGE_NAME:latest
+          docker push $DOCKER_USERNAME/$IMAGE_NAME:latest
